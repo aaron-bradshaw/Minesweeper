@@ -1,3 +1,4 @@
+#Object to host data for each square
 class Square:
 
     def __init__(self, number, value, isRevealed, isFlagged, position):

@@ -4,17 +4,23 @@ from random import randrange
 from Square import Square
 from Game import Game
 
+#Runs the game
 def playGame():
     generateBoard()
 
+    #Loops until game end
     while not(gameData.gameEnd) :
         clear()
         print(gameData.grid)
         print(gameData.message)
         collectInput()
+
+    #Promts user to play again    
     notValid = True
+    #loops until valid user input
     while notValid:
         repeat = input("Play again? (Y/N): ").lower()
+
         if repeat == 'y':
             notValid = False
             playGame()
@@ -24,19 +30,17 @@ def playGame():
             print("Invalid Input. Input \"Y\" for yes or \"N\" for no")
 
         
-        
-
-    
-
-
+# initializes game and resets values
 def generateBoard():
     global squares
     global gameData
     success = False
+    #Loops until valid user input
     while not(success):
         try:
             valid = False
             while not(valid):
+                #Promts user for desired grid size
                 gameSize  =  int(input("Enter the size of the game (min 4, max 26): "))
                 if gameSize > 26 or gameSize < 4:
                     clear()
@@ -49,7 +53,7 @@ def generateBoard():
             print("Invalid Input, enter an integer from 4 to 26")
 
     
-    
+    #Assigns game data
     gameData = Game(gameSize, '', [], 0, False, False, False, '')
     mineLocations = generateMines()
     squares = generateSquares(squareValues(mineLocations), squarePositions())
@@ -57,11 +61,12 @@ def generateBoard():
     gameData.grid = drawGrid()
     gameData.numFlags = len(mineLocations)
     
-
+#Generates mine locations
 def generateMines():
     numSquares = gameData.gameSize**2
     numMines = floor(numSquares * 0.2)
     mineLocations = []
+    #Randomly places mines until desired number is reached
     for i in range(numMines):
         valid = False
         while not(valid):
@@ -71,6 +76,7 @@ def generateMines():
                 mineLocations.append(location)
     return(mineLocations)
 
+#Assigns values to every square
 def squareValues(mineLocations):
     numSquares = gameData.gameSize ** 2
     squareValues = []
@@ -88,6 +94,7 @@ def squareValues(mineLocations):
 
     return(squareValues)
 
+#Converts square value locations to grid locations
 def squarePositions():
     positions = []
     tempPos = (gameData.gameSize * 4)
@@ -101,8 +108,7 @@ def squarePositions():
             tempPos += (gameData.gameSize * 4)+7
     return(positions)
 
-
-
+#Creates list of all square data objects
 def generateSquares(squareValues, squarePositions):
     squares = []
     for i in range(len(squareValues)):
@@ -110,6 +116,7 @@ def generateSquares(squareValues, squarePositions):
     
     return(squares)
 
+#Flags square
 def flagSquare(location):
     if gameData.numFlags > 0:
         if not(squares[location].isRevealed):
@@ -122,7 +129,7 @@ def flagSquare(location):
             gameData.message = 'Cannot flag already revealed squares'
     else:
         gameData.message = 'You have no flags remaining'
-
+#Unflags square
 def unFlagSquare(location):
     if squares[location].isFlagged:
         gameData.numFlags += 1
@@ -132,6 +139,7 @@ def unFlagSquare(location):
     else:
         gameData.message = 'Square is not flagged'    
 
+#Reveals selected squares and adjacent zero squares
 def revealSquare(location):
     pos = squares[location].position
     value = squares[location].value
@@ -153,32 +161,36 @@ def revealSquare(location):
         gameData.grid = gameData.grid[0:pos] + 'M' + gameData.grid[pos+1:]
         squares[location].isRevealed = True
         hitMine()
-    
+#Ends game if mine is revealed
 def hitMine():
     gameData.loseGame = True
     for mine in gameData.mines:
         if not(squares[mine].isRevealed):
             revealSquare(mine)
     endGame()
-
+# Checks if player has won
 def winGame():
     flaggedCount = 0
     revealedCount = 0
+    #counts flagged squares
     for mine in gameData.mines:
         if squares[mine].isFlagged == True:
             flaggedCount += 1
+    #counts revealed squares
     for square in range(len(squares)):
         if squares[square].isRevealed:
             revealedCount += 1
+    #ends game if all mines are flagged
     if flaggedCount == len(gameData.mines):
         gameData.winGame = True
         endGame()
+    #ends game if all non mines are revealed
     elif revealedCount == (len(squares) - len(gameData.mines)):
         gameData.winGame = True
         endGame()
 
 
-
+#Collects user action
 def collectInput():
     print("Flags:("+str(gameData.numFlags)+"/"+str(len(gameData.mines))+")")
     action  = input("Choose a square: ")
@@ -204,7 +216,7 @@ def collectInput():
     except IndexError:
         gameData.message = "Invalid Input. type \"instructions\" for help"
     
-
+#Ends game and prints outcome
 def endGame():
     gameData.gameEnd = True
     clear()
@@ -215,7 +227,7 @@ def endGame():
         print("You Win")
 
 
-
+#Draws the board
 def drawGrid():
     n = 0
     output = ''
@@ -257,7 +269,7 @@ def drawGrid():
     output += "\n"  
     return(output)
 
-
+#Gets the valid neighboring squares
 def getNeighbors(location):
     neighbors = []
     row = floor(location / gameData.gameSize)
@@ -284,7 +296,10 @@ def getNeighbors(location):
         
     return(neighbors)
 
+#Clears the output
 def clear():
     os.system("cls")
 
+
+#Starts game
 playGame()

@@ -1,3 +1,4 @@
+#Object to host game data
 class Game:
     def __init__(self, gameSize, grid, mines, numFlags, gameEnd, winGame, loseGame, message):
         self.gameSize = gameSize
