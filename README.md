@@ -1,3 +1,3 @@
 # Minesweeper
 
-Text bases minesweeper with variable grid size
+Text based minesweeper with variable grid size
